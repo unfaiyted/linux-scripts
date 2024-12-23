@@ -1,0 +1,73 @@
+version: "3.9"
+
+networks:
+  backbone:
+    driver: bridge
+  private:
+    external: true
+  vpn:
+    driver: bridge
+
+services:
+  tdarr-node:
+    container_name: tdarr-node
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    restart: unless-stopped
+#    network_mode: service:tdarr
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
+    environment:
+      - TZ=America/Chicago
+      - PUID=1000
+      - PGID=1000
+      - UMASK_SET=002
+      - nodeName=faiytPcNode
+      - serverIP=192.168.0.120
+      - serverPort=8266
+      - inContainer=true
+    volumes:
+      - ./tdarr/configs:/app/configs
+      - ./tdarr/logs:/app/logs
+      - /media:/media:rw
+      - /media/faiyt/i/transcode:/temp:rw
+#  portainer:
+#    container_name: portainer
+#    image: portainer/portainer-ce
+#    restart: always
+#    ports:
+#      - "9001:9000/tcp"
+#    environment:
+#      - TZ=America/Chicago
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /opt/portainer:/data
+#
+
+
+
+  portainer_agent:
+      container_name: portainer_agent 
+      image: portainer/agent:2.18.3
+      ports: 
+        - 9002:9001
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/lib/docker/volumes:/var/lib/docker/volumes
+      restart: unless-stopped
+  whisperasr:
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    environment:
+      - ASR_MODEL=medium
+    ports:
+      - 9000:9000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
