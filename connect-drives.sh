@@ -8,17 +8,26 @@ sudo mkdir -p /mnt/server110/config  # media
 sudo mkdir -p /mnt/server101/config  # download
 sudo mkdir -p /mnt/server123/config  # apps
 sudo mkdir -p /mnt/playground/config # apps
+sudo mkdir -p /mnt/vps/config
 
 # Mount the Samba share from 192.168.0.109
-sudo mount -t cifs //192.168.0.109/config /mnt/server109/config -o credentials=/home/faiyt/.creds/root
+sudo mount -t cifs //192.168.0.109/config /mnt/server109/config -o credentials=/home/faiyt/.creds/root,uid=faiyt,gid=faiyt
 sudo mount -t cifs //192.168.0.101/config /mnt/server101/config -o credentials=/home/faiyt/.creds/faiyt
 sudo mount -t cifs //192.168.0.110/config /mnt/server110/config -o credentials=/home/faiyt/.creds/faiyt
 sudo mount -t cifs //192.168.0.123/config /mnt/server123/config -o credentials=/home/faiyt/.creds/faiyt
-# sudo mount -t cifs //192.168.0.231/config /mnt/playground/config -o credentials=/home/faiyt/.creds/faiyt
+# sudo mount -t cifs //192.168.0.231/config /mnt/playgrounjd/config -o credentials=/home/faiyt/.creds/faiyt
 sudo mount -t cifs //192.168.0.231/config /mnt/playground/config -o credentials=/home/faiyt/.creds/faiyt,uid=faiyt,gid=faiyt
 
 sudo mount -t nfs 192.168.0.101:/mnt/downloads /mnt/downloads
 sudo mount -t nfs 192.168.0.110:/mnt/raid /mnt/raid
+
+
+# ssh -L 2049:localhost:2049 -L 111:localhost:111 user@your_server_ip -N
+# sudo mount -t nfs 209.74.71.189:/config /mnt/vps/config
+
+ sshfs root@209.74.71.189:/config /mnt/vps/config -p 22022 -o reconnect,compression=yes,cache=yes,IdentityFile=~/.ssh/id_ecdsa
+
+
 
 # Check if mount was successful
 if mountpoint -q /mnt/server109/config; then
@@ -61,6 +70,12 @@ if mountpoint -q /mnt/playground/config; then
   echo "Successfully mounted /config from 192.168.0.231"
 else
   echo "Failed to mount /config from 192.168.0.231"
+fi
+
+if mountpoint -q /mnt/vps/config; then
+  echo "Successfully mounted /mnt/vps from 209.74.71.189"
+else
+  echo "Failed to mount /mnt/vps from 209.74.71.189"
 fi
 
 # Template for additional servers:

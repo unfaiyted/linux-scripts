@@ -46,7 +46,7 @@ case "$SELECTION" in
   ;;
 "record eDP-1")
   echo "$VID" >/tmp/recording.txt
-  wf-recorder -a -o eDP-1 -f "$VID" &>/dev/null
+  wf-recorder -a -o eDP-1 -f "$VID"
   ;;
 "record HDMI-A-1")
   # echo "$VID" >/tmp/recording.txt
